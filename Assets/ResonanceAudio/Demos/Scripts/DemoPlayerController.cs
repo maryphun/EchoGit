@@ -38,7 +38,7 @@ public class DemoPlayerController : MonoBehaviour {
 
   void Start() {
     characterController = GetComponent<CharacterController>();
-    Vector3 rotation = mainCamera.transform.localRotation.eulerAngles;
+    Vector3 rotation = mainCamera.transform.rotation.eulerAngles;
     rotationX = rotation.x;
     rotationY = rotation.y;
   }
@@ -59,15 +59,15 @@ public class DemoPlayerController : MonoBehaviour {
       mouseX = 0.0f;
       mouseY = 0.0f;
     }
-    rotationX += sensitivity * mouseY;
+    //rotationX += sensitivity * mouseY;
     rotationY += sensitivity * mouseX;
     rotationX = Mathf.Clamp(rotationX, -clampAngleDegrees, clampAngleDegrees);
-    mainCamera.transform.localRotation = Quaternion.Euler(rotationX, rotationY, 0.0f);
+    mainCamera.transform.rotation = Quaternion.Euler(rotationX, rotationY, 0.0f);
     // Update the position.
     float movementX = Input.GetAxis("Horizontal");
     float movementY = Input.GetAxis("Vertical");
     Vector3 movementDirection = new Vector3(movementX, 0.0f, movementY);
-    movementDirection = mainCamera.transform.localRotation * movementDirection;
+    movementDirection = mainCamera.transform.rotation * movementDirection;
     movementDirection.y = 0.0f;
     Move(movementDirection);
   }
