@@ -17,30 +17,40 @@ using UnityEngine;
 /// First-person player controller for Resonance Audio demo scenes.
 [RequireComponent(typeof(CharacterController))]
 public class DemoPlayerController : MonoBehaviour {
-  /// Camera.
-  public Camera mainCamera;
+      /// Camera.
+      public Camera mainCamera;
 
-  // Character controller.
-  private CharacterController characterController = null;
+      // Character controller.
+      private CharacterController characterController = null;
 
-  // Player movement speed.
-  [SerializeField] private float movementSpeed = 5.0f;
+      // Player movement speed.
+      [SerializeField] private float movementSpeed = 5.0f;
 
-  // Target camera rotation in degrees.
-  private float rotationX = 0.0f;
-  private float rotationY = 0.0f;
+      [SerializeField] private AudioSource walkingAudio;
+    [SerializeField] private float walkingSoundValume = 0.8f;
+    [SerializeField] private AudioSource targetSoundEffect;
 
-  // Maximum allowed vertical rotation angle in degrees.
-  private const float clampAngleDegrees = 80.0f;
+      // Target camera rotation in degrees.
+      private float rotationX = 0.0f;
+      private float rotationY = 0.0f;
 
-  // Camera rotation sensitivity.
-  private const float sensitivity = 2.0f;
+      // Maximum allowed vertical rotation angle in degrees.
+      private const float clampAngleDegrees = 80.0f;
+
+      // Camera rotation sensitivity.
+      private const float sensitivity = 2.0f;
+
+      private bool isMoving;
+    private float targetWalkingVolume;
+
+    private Vector3 lastPosition;
 
   void Start() {
     characterController = GetComponent<CharacterController>();
     Vector3 rotation = mainCamera.transform.rotation.eulerAngles;
     rotationX = rotation.x;
     rotationY = rotation.y;
+        isMoving = false;
   }
 
   void LateUpdate() {
@@ -69,8 +79,44 @@ public class DemoPlayerController : MonoBehaviour {
     Vector3 movementDirection = new Vector3(movementX, 0.0f, movementY);
     movementDirection = mainCamera.transform.rotation * movementDirection;
     movementDirection.y = 0.0f;
-    Move(movementDirection);
-  }
+
+        if (movementDirection.magnitude != 0.0f)
+        {
+            Move(movementDirection);
+        }
+
+
+        // determine if the player is moving
+        isMoving = false;
+        if (lastPosition != transform.position)
+        {
+            isMoving = true;
+        }
+
+        if (isMoving)
+        {
+            if (targetWalkingVolume == 0.0f)
+            {
+                targetWalkingVolume = walkingSoundValume;
+            }
+        }
+        else
+        {
+            if (targetWalkingVolume == walkingSoundValume)
+            {
+                targetWalkingVolume = 0.0f;
+            }
+        }
+        lastPosition = transform.position;
+
+        //lerp audio to its target volume
+        walkingAudio.volume = Mathf.MoveTowards(walkingAudio.volume, targetWalkingVolume, 5f * Time.deltaTime);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            ListenTarget();
+        }
+    }
 
   // Sets the cursor lock for first-person control.
   private void SetCursorLock(bool lockCursor) {
@@ -85,6 +131,20 @@ public class DemoPlayerController : MonoBehaviour {
 
     private void Move(Vector3 directionVector)
     {
-        characterController.SimpleMove(movementSpeed * directionVector);
+        Ray ray = new Ray(new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z), directionVector);
+        RaycastHit hit;
+        Debug.DrawRay(new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z), directionVector, Color.red, 1.0f);
+        bool moveable = !Physics.Raycast(ray, out hit, movementSpeed * Time.deltaTime);
+
+        if (moveable)
+        {
+            characterController.SimpleMove(movementSpeed * directionVector);
+            return;
+        }
+    }
+
+    private void ListenTarget()
+    {
+        targetSoundEffect.Play();
     }
 }
