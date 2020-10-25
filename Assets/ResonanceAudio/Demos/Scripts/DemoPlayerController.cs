@@ -42,43 +42,56 @@ public class DemoPlayerController : MonoBehaviour {
 
       private bool isMoving;
     private float targetWalkingVolume;
+    private bool enableMovement, enableTarget;
 
     private Vector3 lastPosition;
 
-  void Start() {
-    characterController = GetComponent<CharacterController>();
-    Vector3 rotation = mainCamera.transform.rotation.eulerAngles;
-    rotationX = rotation.x;
-    rotationY = rotation.y;
+    void Start()
+    {
+        characterController = GetComponent<CharacterController>();
+        Vector3 rotation = mainCamera.transform.rotation.eulerAngles;
+        rotationX = rotation.x;
+        rotationY = rotation.y;
         isMoving = false;
-  }
+        SetCursorLock(true);
+    }
 
-  void LateUpdate() {
-#if UNITY_EDITOR
-    if (Input.GetMouseButtonDown(0)) {
-      SetCursorLock(true);
-    } else if (Input.GetKeyDown(KeyCode.Escape)) {
-      SetCursorLock(false);
-    }
-#endif  // UNITY_EDITOR
-    // Update the rotation.
-    float mouseX = Input.GetAxis("Mouse X");
-    float mouseY = -Input.GetAxis("Mouse Y");
-    if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) {
-      // Note that multi-touch control is not supported on mobile devices.
-      mouseX = 0.0f;
-      mouseY = 0.0f;
-    }
-    //rotationX += sensitivity * mouseY;
-    rotationY += sensitivity * mouseX;
-    rotationX = Mathf.Clamp(rotationX, -clampAngleDegrees, clampAngleDegrees);
-    mainCamera.transform.rotation = Quaternion.Euler(rotationX, rotationY, 0.0f);
-    // Update the position.
-    float movementX = Input.GetAxis("Horizontal");
-    float movementY = Input.GetAxis("Vertical");
-    Vector3 movementDirection = new Vector3(movementX, 0.0f, movementY);
-    movementDirection = mainCamera.transform.rotation * movementDirection;
-    movementDirection.y = 0.0f;
+    void LateUpdate()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            SetCursorLock(true);
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SetCursorLock(false);
+        }
+
+        // Update the rotation.
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = -Input.GetAxis("Mouse Y");
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+            // Note that multi-touch control is not supported on mobile devices.
+            mouseX = 0.0f;
+            mouseY = 0.0f;
+        }
+        //rotationX += sensitivity * mouseY;
+        rotationY += sensitivity * mouseX;
+        rotationX = Mathf.Clamp(rotationX, -clampAngleDegrees, clampAngleDegrees);
+        mainCamera.transform.rotation = Quaternion.Euler(rotationX, rotationY, 0.0f);
+        // Update the position.
+        float movementX = Input.GetAxis("Horizontal");
+        float movementY = Input.GetAxis("Vertical");
+        Vector3 movementDirection = new Vector3(movementX, 0.0f, movementY);
+
+        if (!enableMovement)
+        {
+            movementDirection = Vector3.zero;
+        }
+
+        movementDirection = mainCamera.transform.rotation * movementDirection;
+        movementDirection.y = 0.0f;
 
         if (movementDirection.magnitude != 0.0f)
         {
@@ -112,22 +125,23 @@ public class DemoPlayerController : MonoBehaviour {
         //lerp audio to its target volume
         walkingAudio.volume = Mathf.MoveTowards(walkingAudio.volume, targetWalkingVolume, 5f * Time.deltaTime);
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && enableTarget)
         {
             ListenTarget();
         }
     }
 
-  // Sets the cursor lock for first-person control.
-  private void SetCursorLock(bool lockCursor) {
-    if (lockCursor) {
-      Cursor.lockState = CursorLockMode.Locked;
-      Cursor.visible = false;
-    } else {
-      Cursor.lockState = CursorLockMode.None;
-      Cursor.visible = true;
+    // Sets the cursor lock for first-person control.
+    private void SetCursorLock(bool lockCursor)
+    {
+        if (lockCursor) {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        } else {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
-  }
 
     private void Move(Vector3 directionVector)
     {
@@ -145,6 +159,16 @@ public class DemoPlayerController : MonoBehaviour {
 
     private void ListenTarget()
     {
+        targetSoundEffect.volume = 1.0f;
         targetSoundEffect.Play();
+    }
+
+    public void SetEnableMovement(bool boolean)
+    {
+        enableMovement = boolean;
+    }
+    public void SetEnableTarget(bool boolean)
+    {
+        enableTarget = boolean;
     }
 }
