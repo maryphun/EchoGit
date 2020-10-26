@@ -35,6 +35,11 @@ public class controlUIcanvas : MonoBehaviour
         bgm.DOFade(1.0f, 0.5f);
     }
 
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+
     public void StartGame()
     {
         transitionImage.DOFade(1.0f, 2.0f);

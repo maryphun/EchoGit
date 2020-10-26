@@ -53,20 +53,10 @@ public class DemoPlayerController : MonoBehaviour {
         rotationX = rotation.x;
         rotationY = rotation.y;
         isMoving = false;
-        SetCursorLock(true);
     }
 
     void LateUpdate()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            SetCursorLock(true);
-        }
-        else if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            SetCursorLock(false);
-        }
-
         // Update the rotation.
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = -Input.GetAxis("Mouse Y");
@@ -131,17 +121,6 @@ public class DemoPlayerController : MonoBehaviour {
         }
     }
 
-    // Sets the cursor lock for first-person control.
-    private void SetCursorLock(bool lockCursor)
-    {
-        if (lockCursor) {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        } else {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-    }
 
     private void Move(Vector3 directionVector)
     {

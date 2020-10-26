@@ -9,7 +9,6 @@ public class GameCanvas : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        frontimage.DOFade(0.0f, 1.5f);
+        frontimage.DOFade(0.0f, 3f);
     }
-    
 }
