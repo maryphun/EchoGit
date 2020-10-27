@@ -39,6 +39,8 @@ public class GameSubMenu : MonoBehaviour
 
                 cnavasGroup.DOFade(0.0f, 0.5f);
                 cnavasGroup.interactable = false;
+
+                cnavasGroup.GetComponent<RectTransform>().DOAnchorPosX(370f, 0.5f, false);
             }
             else
             {
@@ -46,6 +48,8 @@ public class GameSubMenu : MonoBehaviour
 
                 cnavasGroup.DOFade(1.0f, 0.5f);
                 cnavasGroup.interactable = true;
+
+                cnavasGroup.GetComponent<RectTransform>().DOAnchorPosX(960f, 0.5f, false);
             }
             menuEnabled = !menuEnabled;
         }

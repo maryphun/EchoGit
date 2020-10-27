@@ -14,7 +14,7 @@ public class PScript : MonoBehaviour
         audiosource = GetComponent<AudioSource>();
     }
 
-    public IEnumerator PartOne()
+    public IEnumerator PartTwo()
     {
         audiosource.clip = clips[0];
         audiosource.Play();
