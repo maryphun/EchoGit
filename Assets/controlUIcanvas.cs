@@ -9,9 +9,20 @@ public class controlUIcanvas : MonoBehaviour
 {
     [SerializeField] private Canvas controlCheckCanvas;
     [SerializeField] private Canvas headphoneTestCanvas;
+    [SerializeField] private Canvas microphoneCanvas;
     [SerializeField] private AudioSource bgm;
 
     [SerializeField] private CanvasGroup transitionImage;
+
+    public void OpenMicrophonePanel()
+    {
+        StartCoroutine(Fade(true, microphoneCanvas.gameObject, 0.35f));
+    }
+
+    public void CloseMicrophonePanel()
+    {
+        StartCoroutine(Fade(false, microphoneCanvas.gameObject, 0.35f));
+    }
 
     public void OpenControlPanel()
     {

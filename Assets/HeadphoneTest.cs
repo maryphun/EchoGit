@@ -41,7 +41,6 @@ public class HeadphoneTest : MonoBehaviour
     {
         audiosourceCube.GetComponent<AudioSource>().volume = 0.0f;
         audiosourceCube.GetComponent<AudioSource>().DOFade(1.0f, 0.5f);
-        Debug.Log("play");
     }
 
     private void OnDisable()

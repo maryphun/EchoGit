@@ -6,6 +6,7 @@ using DG.Tweening;
 public class Timeline : MonoBehaviour
 {
     [Header("Default configuration")]
+    [SerializeField] private GameCanvas gameCanvas;
     [SerializeField] private DemoPlayerController playerScript;
     [SerializeField] private Transform target;
     [SerializeField] private PScript P;
@@ -44,6 +45,11 @@ public class Timeline : MonoBehaviour
             StartCoroutine(PartOne());
             part++;
         }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            DebugMode();
+        }
     }
 
     public void PartDone(int part)
@@ -51,12 +57,20 @@ public class Timeline : MonoBehaviour
         switch (part)
         {
             case 1:
+                StartCoroutine(PartTwo());
+                break;
+            case 2:
                 enableMovement = true;
                 enableTarget = true;
                 playerScript.SetEnableMovement(enableMovement);
                 playerScript.SetEnableTarget(enableTarget);
                 break;
             default:
+                enableMovement = true;
+                enableTarget = true;
+                playerScript.SetEnableMovement(enableMovement);
+                playerScript.SetEnableTarget(enableTarget);
+                gameCanvas.Fade(0.0f, 0.2f);
                 break;
         }
     }
@@ -65,6 +79,13 @@ public class Timeline : MonoBehaviour
     {
         bgmplayer.clip = bgm;
         bgmplayer.Play();
+
+        //Graphic
+        gameCanvas.Fade(0.0f, 2.0f);
+        gameCanvas.Text("- Prologue -");
+        //gameCanvas.IconFade(0.0f, 0f);
+        gameCanvas.ChangeIcon("Book");
+        //
 
         yield return new WaitForSeconds(3.0f);
 
@@ -79,13 +100,72 @@ public class Timeline : MonoBehaviour
 
         bgmplayer.DOFade(1f, 0.25f);
 
-        yield return new WaitForSeconds(56.0f - voice.length);
+        yield return new WaitForSeconds(56.8f - voice.length);
 
-        bgmplayer.DOFade(0f, 0.85f);
+        bgmplayer.DOFade(0f, 0.2f);
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.2f);
 
         bgmplayer.Stop();
         bgmplayer.clip = null;
+
+        //Graphic
+        gameCanvas.Fade(1.0f, 1.5f);
+        
+        yield return new WaitForSeconds(2f);
+
+        gameCanvas.Text("- No vision -");
+        gameCanvas.ChangeIcon("Eye");
+        gameCanvas.Fade(0.0f, 1.5f);
+        playerScript.GetComponent<Transform>().eulerAngles = new Vector3(0.0f, 90.0f, 0.0f);
+
+        PartDone(1);
+    }
+
+    private IEnumerator PartTwo()
+    {
+        float waitTime = 0.0f;
+        waitTime = P.PlayClip(0);
+
+        yield return new WaitForSeconds(waitTime + 1.0f);
+
+        waitTime = P.PlayClip(1);
+
+        yield return new WaitForSeconds(waitTime + 2.0f);
+
+        waitTime = P.PlayClip(2);
+
+        yield return new WaitForSeconds(waitTime + 4.0f);
+
+        waitTime = P.PlayClip(3);
+
+        yield return new WaitForSeconds(waitTime + 3.0f);
+
+        waitTime = P.PlayClip(4);
+
+        yield return new WaitForSeconds(waitTime + 5.0f);
+
+        waitTime = P.PlayClip(5);
+
+        yield return new WaitForSeconds(waitTime + 3.0f);
+
+        waitTime = P.PlayClip(6);
+
+        yield return new WaitForSeconds(waitTime + 3.0f);
+
+        waitTime = P.PlayClip(7);
+
+        yield return new WaitForSeconds(waitTime + 2.0f);
+
+        waitTime = P.PlayClip(8);
+
+        yield return new WaitForSeconds(waitTime + 2.0f);
+
+        PartDone(2);
+    }
+
+    private void DebugMode()
+    {
+        PartDone(9999);
     }
 } 

@@ -43,7 +43,7 @@ public class DemoPlayerController : MonoBehaviour {
       private bool isMoving;
     private float targetWalkingVolume;
     private bool enableMovement, enableTarget;
-
+    
     private Vector3 lastPosition;
 
     void Start()
@@ -114,7 +114,7 @@ public class DemoPlayerController : MonoBehaviour {
 
         //lerp audio to its target volume
         walkingAudio.volume = Mathf.MoveTowards(walkingAudio.volume, targetWalkingVolume, 5f * Time.deltaTime);
-
+        
         if (Input.GetKeyDown(KeyCode.Space) && enableTarget)
         {
             ListenTarget();
@@ -149,5 +149,9 @@ public class DemoPlayerController : MonoBehaviour {
     public void SetEnableTarget(bool boolean)
     {
         enableTarget = boolean;
+    }
+    public bool GetEnableTarget()
+    {
+        return enableTarget;
     }
 }

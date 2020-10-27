@@ -107,10 +107,7 @@ public class SetAtlasUvs : MonoBehaviour
                 uiImage = GetComponent<Image>();
                 if (uiImage != null)
                 {
-                    #if UNITY_EDITOR
-                    Debug.Log("You added the SetAtlasUv component to: " + gameObject.name + " that has a UI Image\n " +
-                    "This SetAtlasUV component will only work properly on UI Images if each Image has a DIFFERENT material instance (See Documentation Sprite Atlases section for more info)");
-                    #endif
+                    
                 }
                 else
                 {
