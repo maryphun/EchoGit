@@ -10,7 +10,7 @@ public class Timeline : MonoBehaviour
     [SerializeField] private DemoPlayerController playerScript;
     [SerializeField] private Transform target;
     [SerializeField] private PScript P;
-    //[SerializeField] private JScript J;
+    [SerializeField] private JScript J;
 
     [Header("Variable")]
     [SerializeField] private bool enableMovement;
@@ -42,7 +42,7 @@ public class Timeline : MonoBehaviour
 
         if (clock > 1.0f && part == 0)
         {
-            StartCoroutine(PartOne());
+            StartCoroutine(PartThree());
             part++;
         }
 
@@ -126,6 +126,7 @@ public class Timeline : MonoBehaviour
     {
         float waitTime = 0.0f;
         waitTime = P.PlayClip(0);
+        P.FadeAudioSource(0.0f, 1.0f, 10f);
 
         yield return new WaitForSeconds(waitTime + 1.0f);
 
@@ -133,7 +134,7 @@ public class Timeline : MonoBehaviour
 
         yield return new WaitForSeconds(waitTime + 2.0f);
 
-        waitTime = P.PlayClip(2);
+        waitTime = P.PlayClip(2, 1);
 
         yield return new WaitForSeconds(waitTime + 4.0f);
 
@@ -162,6 +163,16 @@ public class Timeline : MonoBehaviour
         yield return new WaitForSeconds(waitTime + 2.0f);
 
         PartDone(2);
+    }
+
+    private IEnumerator PartThree()
+    {
+        float waitTime = 0.0f;
+        J.Walk(new Vector3(5.94f, 1f, 0.02f), 4f);
+
+        yield return new WaitForSeconds(waitTime + 1.0f);
+
+        PartDone(3);
     }
 
     private void DebugMode()
