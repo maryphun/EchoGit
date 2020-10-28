@@ -167,10 +167,68 @@ public class Timeline : MonoBehaviour
 
     private IEnumerator PartThree()
     {
-        float waitTime = 0.0f;
-        J.Walk(new Vector3(5.94f, 1f, 0.02f), 4f);
+        float waitTime = 4.0f;
+        J.Walk(new Vector3(5.94f, 1f, -0.02f), waitTime);
 
         yield return new WaitForSeconds(waitTime + 1.0f);
+
+        J.OpenDoor();
+
+        yield return new WaitForSeconds(2.0f);
+
+        waitTime = 1.5f;
+        J.Walk(new Vector3(2.82f, 1f, -0.02f), waitTime);
+        
+        yield return new WaitForSeconds(waitTime + 0.5f);
+
+        waitTime = 3.5f;
+        J.Walk(new Vector3(2.82f, 1f, 3.72f), waitTime);
+        
+        yield return new WaitForSeconds(waitTime / 2f);
+
+        J.PlayClip(0);
+
+        yield return new WaitForSeconds(waitTime / 2f);
+
+        waitTime = 10f;
+        J.Walk(new Vector3(-3.38f, 1f, 0.61f), waitTime);
+        
+        yield return new WaitForSeconds(waitTime + 1.5f);
+
+        waitTime = 2f;
+        J.Walk(new Vector3(-2.31f, 1f, -0.86f), waitTime);
+        
+        yield return new WaitForSeconds(5.5f);
+
+        waitTime = P.PlayClip(9, 2f);
+
+        yield return new WaitForSeconds(waitTime + 0.5f);
+
+        waitTime = J.PlayClip(1);
+
+        yield return new WaitForSeconds(waitTime);
+
+        waitTime = P.PlayClip(10, 2f);
+
+        yield return new WaitForSeconds(waitTime);
+
+        waitTime = J.PlayClip(2, 2f);
+        
+        yield return new WaitForSeconds(waitTime + 2f);
+        
+        waitTime = P.PlayClip(11, 2f);
+
+        yield return new WaitForSeconds(waitTime + 1.5f);
+
+        J.Walk(new Vector3(-0.44f, 1f, 1.84f), 3f);
+
+        yield return new WaitForSeconds(1.5f);
+
+        waitTime = J.PlayClip(3);
+        
+        yield return new WaitForSeconds(waitTime - 1.5f);
+
+        J.Walk(new Vector3(-0.44f, 1f, 1.84f), 3f);
 
         PartDone(3);
     }

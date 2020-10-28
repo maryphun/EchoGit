@@ -11,8 +11,17 @@ public class JScript : MonoBehaviour
     [SerializeField] private float walkingSoundValume = 0.8f;
     private Vector3 lastPosition;
 
+    [SerializeField] private AudioClip[] clips;
+
+    private AudioSource audiosource;
+
     private Vector3 moveTarget, moveOrigin;
     private float moveLerp, moveTime, moveTimePass;
+
+    private void Awake()
+    {
+        audiosource = GetComponent<AudioSource>();
+    }
 
     private void Update()
     {
@@ -57,5 +66,36 @@ public class JScript : MonoBehaviour
         moveOrigin = transform.position;
         moveTarget = targetPos;
         isMoving = true;
+    }
+
+    public void OpenDoor()
+    {
+        foreach (GameObject door in GameObject.FindGameObjectsWithTag("Door"))
+        {
+            Debug.Log(Vector2.Distance(new Vector2(door.transform.position.x, door.transform.position.z), new Vector2(transform.position.x, transform.position.z)) < 1.5f);
+            if (Vector2.Distance(new Vector2(door.transform.position.x, door.transform.position.z), new Vector2(transform.position.x, transform.position.z)) < 1.5f)
+            {
+                door.GetComponent<Door>().Open();
+            }
+        }
+    }
+
+    public float PlayClip(int index)
+    {
+        audiosource.clip = clips[index];
+        audiosource.Play();
+
+        return audiosource.clip.length;
+    }
+
+    public float PlayClip(int index, float inTime)
+    {
+        audiosource.volume = 0.0f;
+        audiosource.DOFade(1.0f, inTime);
+
+        audiosource.clip = clips[index];
+        audiosource.Play();
+
+        return audiosource.clip.length;
     }
 }
