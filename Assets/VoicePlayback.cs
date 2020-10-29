@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(AudioSource))]
 public class VoicePlayback : MonoBehaviour
 {
     // Boolean flags shows if the microphone is connected 
@@ -11,14 +10,17 @@ public class VoicePlayback : MonoBehaviour
     private int minFreq;
     private int maxFreq;
 
-    //A handle to the attached AudioSource  
-    private AudioSource goAudioSource;
-
     [SerializeField] DemoPlayerController player;
     [SerializeField] float maxRecordTime = 4.0f;
 
+    private RaycastHit[] echoHit;
+    [SerializeField] private GameObject audiosourceprefab;
+    private AudioClip clip;
+
+
     void Start()
     {
+        echoHit = new RaycastHit[8];
         //Check if there is at least one microphone connected  
         if (Microphone.devices.Length <= 0)
         {
@@ -39,9 +41,6 @@ public class VoicePlayback : MonoBehaviour
                 //...meaning 44100 Hz can be used as the recording sampling rate  
                 maxFreq = 44100;
             }
-
-            //Get the attached AudioSource component  
-            goAudioSource = this.GetComponent<AudioSource>();
         }
     }
 
@@ -55,15 +54,39 @@ public class VoicePlayback : MonoBehaviour
                 if (!Microphone.IsRecording(null) && player.GetEnableTarget())
                 {
                     //Start recording and store the audio captured from the microphone at the AudioClip in the AudioSource  
-                    goAudioSource.clip = Microphone.Start(null, true, Mathf.RoundToInt(maxRecordTime), maxFreq);
+                    clip = Microphone.Start(null, true, Mathf.RoundToInt(maxRecordTime), maxFreq);
+                    int cnt = 0;
+                    for (int i = -1; i < 2; i++)
+                    {
+                        for (int j = -1; j < 2; j++)
+                        {
+                            if (i == 0 && j == 0)
+                            {
+                                continue;
+                            }
+                            Ray ray = new Ray(player.transform.position, player.mainCamera.transform.forward * i + transform.right * j);
+                            RaycastHit hit;
+                            if (Physics.Raycast(ray, out hit))
+                            {
+                                echoHit[cnt] = hit;
+                                cnt++;
+                                Debug.DrawRay(ray.origin, ray.direction, Color.red, 5.0f);
+
+                            }
+                        }
+                    }
+                    Debug.Log("hellohello");
                 }
             }
             
             if (Input.GetKeyUp(KeyCode.F))
             {
                 Microphone.End(null); //Stop the audio recording  
-                
-                goAudioSource.Play();
+
+                int recursiveCnt = 2;
+                float volume = 1.0f;
+                StartCoroutine(PlayEcho(recursiveCnt,volume,true));
+                //goAudioSource.Play();
             }
         }
         else // No microphone  
@@ -71,6 +94,57 @@ public class VoicePlayback : MonoBehaviour
             Debug.Log("no microphone detected!");
         }
 
+    }
+
+    public IEnumerator PlayEcho(int recursiveCnt,float volume,bool isFirst)
+    {
+        Debug.Log(recursiveCnt);
+        if (recursiveCnt < 0) yield break;
+        recursiveCnt--;
+        float maxDist = 0;
+
+        for (int i = 0; i < 8; i++)
+        {
+
+            if (echoHit[i].distance > maxDist)
+            {
+                maxDist = echoHit[i].distance;
+            }
+            if(!isFirst)
+            {
+                if (echoHit[i].distance <2f)
+                {
+                    continue;
+                }
+            }
+            if (echoHit[i].distance > 1f)
+            {
+                PlaySound(clip, volume * 0.4f, echoHit[i].point);
+            }
+            else
+            {
+                PlaySound(clip, volume , echoHit[i].point);
+            }
+
+        }
+        if (maxDist >2f)
+        {
+            volume *= 0.4f;
+            yield return new WaitForSeconds(0.5f * (2 - recursiveCnt));
+            StartCoroutine(PlayEcho(recursiveCnt,volume,false));
+        }
+        yield return new WaitForSeconds(0); 
+    }
+
+    private void PlaySound(AudioClip clip, float volume,Vector3 point)
+    {
+        var source = Instantiate(audiosourceprefab, point,player.mainCamera.transform.rotation);
+        var component = source.GetComponent<AudioSource>();
+        component.clip = clip;
+        component.volume = volume;
+        component.Play();
+
+        Destroy(source, clip.length);
     }
 }  
 

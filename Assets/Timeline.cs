@@ -39,7 +39,8 @@ public class Timeline : MonoBehaviour
     void Update()
     {
         clock += Time.deltaTime;
-
+        enableTarget = true;
+        enableMovement = true;
         if (clock > 1.0f && part == 0)
         {
             StartCoroutine(PartThree());
