@@ -23,6 +23,10 @@ public class Timeline : MonoBehaviour
     [SerializeField] private AudioSource bgmplayer;
     [SerializeField] private AudioClip bgm, voice;
 
+    [Header("Part Five Reference")]
+    [SerializeField] private Door unlockingDoor;
+    [SerializeField] private Key pickup;
+
     private AudioSource timelineAudioSource;
 
     // Start is called before the first frame update
@@ -30,8 +34,6 @@ public class Timeline : MonoBehaviour
     {
         playerScript.SetEnableMovement(enableMovement);
         playerScript.SetEnableTarget(enableTarget);
-        target.GetComponent<AudioSource>().volume = 0.0f;
-        target.GetComponent<AudioSource>().Play();
         timelineAudioSource = GetComponent<AudioSource>();
     }
 
@@ -58,21 +60,36 @@ public class Timeline : MonoBehaviour
         {
             case 1:
                 StartCoroutine(PartTwo());
+                gameCanvas.EnableCompass(true);
                 break;
             case 2:
                 enableMovement = true;
                 enableTarget = true;
-                playerScript.SetEnableMovement(enableMovement);
-                playerScript.SetEnableTarget(enableTarget);
+                break;
+            case 3:
+                target.position = new Vector3(-2.59f, 1.5f, 0f);
+                playerScript.RequestMoveToTarget(4);
+                break;
+            case 4:
+                enableMovement = false;
+                enableTarget = false;
+                StartCoroutine(PartFour());
+                break;
+            case 5:
+                enableMovement = true;
+                enableTarget = true;
+                target.position = new Vector3(0f, 1.5f, 6.61f);
+                StartCoroutine(PartFive());
                 break;
             default:
                 enableMovement = true;
                 enableTarget = true;
-                playerScript.SetEnableMovement(enableMovement);
-                playerScript.SetEnableTarget(enableTarget);
                 gameCanvas.Fade(0.0f, 0.2f);
                 break;
         }
+
+        playerScript.SetEnableMovement(enableMovement);
+        playerScript.SetEnableTarget(enableTarget);
     }
 
     public IEnumerator PartOne()
@@ -136,7 +153,17 @@ public class Timeline : MonoBehaviour
 
         waitTime = P.PlayClip(2, 1);
 
-        yield return new WaitForSeconds(waitTime + 4.0f);
+        yield return new WaitForSeconds(waitTime + 0.5f);
+
+
+        gameCanvas.Text("- [F]键 使用麦克风 -");
+        while (!Input.GetKeyDown(KeyCode.F))
+        {
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(waitTime + 1.5f);
+        gameCanvas.Text("- No vision -");
 
         waitTime = P.PlayClip(3);
 
@@ -162,11 +189,15 @@ public class Timeline : MonoBehaviour
 
         yield return new WaitForSeconds(waitTime + 2.0f);
 
+        gameCanvas.Text("- [空格键]获取前进方向 -");
+
         PartDone(2);
     }
 
-    private IEnumerator PartThree()
+    private IEnumerator PartFour()
     {
+        gameCanvas.Text("- No vision -");
+
         float waitTime = 4.0f;
         J.Walk(new Vector3(5.94f, 1f, -0.02f), waitTime);
 
@@ -222,24 +253,123 @@ public class Timeline : MonoBehaviour
 
         waitTime = J.PlayClip(4);
         
-        yield return new WaitForSeconds(waitTime - 1.5f);
+        yield return new WaitForSeconds(waitTime - 3f);
 
-        waitTime = 3f;
+        waitTime = 4.5f;
         J.Walk(new Vector3(-0.44f, 1f, 1.84f), waitTime);
 
         yield return new WaitForSeconds(waitTime - 0.5f);
 
-        waitTime = J.EventOne();
+        waitTime = J.OpenChestSound();
 
         yield return new WaitForSeconds(waitTime - 1.0f);
 
         waitTime = P.PlayClip(12, 2f);
-
+        
         yield return new WaitForSeconds(waitTime * 0.75f);
 
-        waitTime = P.PlaySoundEffect(36, 1.0f);
+        waitTime = P.PlaySoundEffect(36, 1.0f, 2f, 1f);
 
-        PartDone(3);
+        yield return new WaitForSeconds(waitTime + 1.5f);
+
+        //laugh
+        J.PlayClip(8, 0.5f, 1f);
+
+        waitTime = 2.0f;
+        J.Walk(new Vector3(3.23f, 1f, 1.84f), waitTime);
+
+        yield return new WaitForSeconds(1.2f);
+
+        J.PlayClip(6);
+
+        yield return new WaitForSeconds(waitTime - 1.2f);
+
+        waitTime = 1.0f;
+        J.Walk(new Vector3(4f, 1f, 0f), waitTime);
+        yield return new WaitForSeconds(waitTime);
+
+        waitTime = 1.0f;
+        J.OpenDoor(true);
+        yield return new WaitForSeconds(waitTime);
+        
+        waitTime = 4.0f;
+        J.Walk(new Vector3(13f, 1f, 0f), waitTime);
+        yield return new WaitForSeconds(waitTime);
+
+        //laugh
+        waitTime = J.PlayClip(7);
+        yield return new WaitForSeconds(waitTime+0.2f);
+
+        waitTime = P.PlayClip(13, 1f);
+        yield return new WaitForSeconds(waitTime+ 1f);
+
+        waitTime = P.PlayClip(14, 1f);
+
+        gameCanvas.Text("- Find the way out -");
+
+        PartDone(5);
+    }
+
+    private IEnumerator PartFive()
+    {
+        unlockingDoor.UnlockWithoutSE();
+        while (Vector2.Distance(new Vector2(target.position.x, target.position.z), new Vector2(playerScript.transform.position.x, playerScript.transform.position.z)) > 1.90f)
+        {
+            yield return null;
+        }
+        
+        float waitTime = P.PlayClip(15, 1f);
+
+        yield return new WaitForSeconds(waitTime);
+        
+        target.position = new Vector3(0f, 1.5f, 13f);
+        
+        gameCanvas.Text("- No vision -");
+        
+        waitTime = P.PlayClip(17);
+
+        yield return new WaitForSeconds(waitTime);
+
+        while (Vector2.Distance(new Vector2(target.position.x, target.position.z), new Vector2(playerScript.transform.position.x, playerScript.transform.position.z)) > 1.60f)
+        {
+            yield return null;
+        }
+
+        P.PlayClip(18);
+
+        gameCanvas.ChangeIcon("Key");
+        gameCanvas.Text("- Find the key -");
+
+        target.position = new Vector3(pickup.transform.position.x, 1.5f, pickup.transform.position.z);
+
+        while (!pickup.pickedUp)
+        {
+            yield return null;
+        }
+        
+        //play key pick up sound here (length = waittime)
+
+        gameCanvas.ChangeIcon("Eye");
+        gameCanvas.Text("- Return -");
+        target.position = new Vector3(P.transform.position.x, 1.5f, P.transform.position.z);
+
+        yield return new WaitForSeconds(waitTime);
+
+        waitTime = P.PlayClip(19);
+        float timecnt = 0.0f;
+
+        while (Vector2.Distance(new Vector2(target.position.x, target.position.z), new Vector2(playerScript.transform.position.x, playerScript.transform.position.z)) > 1.60f)
+        {
+            timecnt += Time.deltaTime;
+            if (timecnt >= 8.0f)
+            {
+                timecnt = 0.0f;
+                P.PlayClip(Random.Range(19, 20));
+            }
+            yield return null;
+        }
+
+        
     }
 
     private void DebugMode()

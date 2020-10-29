@@ -28,10 +28,13 @@ public class DemoPlayerController : MonoBehaviour {
 
       [SerializeField] private AudioSource walkingAudio;
     [SerializeField] private float walkingSoundValume = 0.8f;
-    [SerializeField] private AudioSource targetSoundEffect;
+    [SerializeField] private Transform targetSoundEffect;
+    [SerializeField] private AudioClip targetSoundClip;
+    [SerializeField] private Timeline timeline;
+    [SerializeField] GameObject audiosourcePrefab;
 
-      // Target camera rotation in degrees.
-      private float rotationX = 0.0f;
+    // Target camera rotation in degrees.
+    private float rotationX = 0.0f;
       private float rotationY = 0.0f;
 
       // Maximum allowed vertical rotation angle in degrees.
@@ -43,6 +46,8 @@ public class DemoPlayerController : MonoBehaviour {
       private bool isMoving;
     private float targetWalkingVolume;
     private bool enableMovement, enableTarget;
+    private bool requestedPosition;
+    private int requestedPositionDonePart;
     
     private Vector3 lastPosition;
 
@@ -53,6 +58,8 @@ public class DemoPlayerController : MonoBehaviour {
         rotationX = rotation.x;
         rotationY = rotation.y;
         isMoving = false;
+        requestedPosition = false;
+        requestedPositionDonePart = 0;
     }
 
     void LateUpdate()
@@ -119,6 +126,16 @@ public class DemoPlayerController : MonoBehaviour {
         {
             ListenTarget();
         }
+
+        // 
+        if (requestedPosition)
+        {
+            if (Vector2.Distance(new Vector2(targetSoundEffect.position.x, targetSoundEffect.position.z), new Vector2(transform.position.x, transform.position.z)) < 1.5f)
+            {
+                timeline.PartDone(requestedPositionDonePart);
+                requestedPosition = false;
+            }
+        }
     }
 
 
@@ -138,8 +155,7 @@ public class DemoPlayerController : MonoBehaviour {
 
     private void ListenTarget()
     {
-        targetSoundEffect.volume = 1.0f;
-        targetSoundEffect.Play();
+        PlaySound(targetSoundClip, 1.0f, targetSoundEffect);
     }
 
     public void SetEnableMovement(bool boolean)
@@ -153,5 +169,23 @@ public class DemoPlayerController : MonoBehaviour {
     public bool GetEnableTarget()
     {
         return enableTarget;
+    }
+
+    public void RequestMoveToTarget(int part)
+    {
+        requestedPosition = true;
+        requestedPositionDonePart = part;
+    }
+
+    private float PlaySound(AudioClip clip, float volume, Transform target)
+    {
+        var source = Instantiate(audiosourcePrefab, target);
+        var component = source.GetComponent<AudioSource>();
+        component.clip = clip;
+        component.volume = volume;
+        component.Play();
+
+        Destroy(source, clip.length);
+        return clip.length;
     }
 }

@@ -8,51 +8,57 @@ public class PScript : MonoBehaviour
     [SerializeField] private AudioClip[] clips;
     [SerializeField] private Timeline timeline;
     [SerializeField] GameObject audiosourcePrefab;
-
-    private AudioSource audiosource;
-
-    private void Awake()
-    {
-        audiosource = GetComponent<AudioSource>();
-    }
-
+    
     public float PlayClip(int index)
     {
-        audiosource.clip = clips[index];
-        audiosource.Play();
+        //audiosource.clip = clips[index];
+        //audiosource.Play();
 
-        return audiosource.clip.length;
+        PlaySound(clips[index], 1f);
+
+        return clips[index].length;
     }
 
     public float PlayClip(int index, float inTime)
     {
-        audiosource.volume = 0.0f;
-        audiosource.DOFade(1.0f, inTime);
-
-        audiosource.clip = clips[index];
-        audiosource.Play();
+        var component = PlaySound(clips[index], 0f);
+        component.DOFade(1.0f, inTime);
         
-        return audiosource.clip.length;
+        return clips[index].length;
     }
 
     public void FadeAudioSource(float targetValue, float time)
     {
-        audiosource.DOFade(targetValue, time);
+        var components = GetComponentsInChildren<AudioSource>();
+        foreach (AudioSource component in components)
+        {
+            if (component.gameObject.tag != "Foot")
+            {
+                component.DOFade(targetValue, time);
+            }
+        }
     }
 
     public void FadeAudioSource(float originValue, float targetValue, float time)
     {
-        audiosource.volume = originValue;
-        audiosource.DOFade(targetValue, time);
+        var components = GetComponentsInChildren<AudioSource>();
+        foreach (AudioSource component in components)
+        {
+            if (component.gameObject.tag != "Foot")
+            {
+                component.volume = originValue;
+                component.DOFade(targetValue, time);
+            }
+        }
     }
 
-    public float PlaySoundEffect(int clip, float volume)
+    public float PlaySoundEffect(int clip, float volume, float end, float fadeoutTime)
     {
         //Open chest
-        return PlaySound(clips[clip], volume, transform.position);
+        return PlaySound(clips[clip], volume, transform.position, end, fadeoutTime);
     }
 
-    private float PlaySound(AudioClip clip, float volume, Vector3 target)
+    private float PlaySound(AudioClip clip, float volume, Vector3 target, float end, float fadeoutTime)
     {
         var source = Instantiate(audiosourcePrefab, target, Quaternion.identity);
         var component = source.GetComponent<AudioSource>();
@@ -60,7 +66,28 @@ public class PScript : MonoBehaviour
         component.volume = volume;
         component.Play();
 
-        Destroy(source, clip.length);
+        StartCoroutine(FadeAfterTime(end, fadeoutTime, component));
         return clip.length;
+    }
+
+    private IEnumerator FadeAfterTime(float end, float time, AudioSource target)
+    {
+        yield return new WaitForSeconds(end);
+
+        target.DOFade(0.0f, time);
+
+        Destroy(target.gameObject, time);
+    }
+
+    private AudioSource PlaySound(AudioClip clip, float volume)
+    {
+        var source = Instantiate(audiosourcePrefab, transform);
+        var component = source.GetComponent<AudioSource>();
+        component.clip = clip;
+        component.volume = volume;
+        component.Play();
+
+        Destroy(source, clip.length);
+        return component;
     }
 }

@@ -25,6 +25,11 @@ public class Door : MonoBehaviour
         {
             PlaySound(openLockedDoor, 0.4f);
         }
+        
+        if (GetComponent<PartOne>() != null)
+        {
+            GetComponent<PartOne>().DoorInteracted();
+        }
     }
 
     public void OpenAndClose(float delay)
@@ -41,6 +46,11 @@ public class Door : MonoBehaviour
         {
             PlaySound(openLockedDoor, 0.4f);
         }
+    }
+
+    public void UnlockWithoutSE()
+    {
+        locked = false;
     }
 
     private IEnumerator CloseAfterDelay(float time)

@@ -10,6 +10,7 @@ public class GameCanvas : MonoBehaviour
     [SerializeField] private CanvasGroup frontimage;
     [SerializeField] private TMP_Text text;
     [SerializeField] private Image icon;
+    [SerializeField] private GameObject compass;
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +34,11 @@ public class GameCanvas : MonoBehaviour
     
     public void ChangeIcon(string iconName)
     {
-        icon.GetComponent<Animator>().SetTrigger("iconName");
+        icon.GetComponent<Animator>().SetTrigger(iconName);
+    }
+
+    public void EnableCompass(bool boolean)
+    {
+        compass.SetActive(boolean);
     }
 }

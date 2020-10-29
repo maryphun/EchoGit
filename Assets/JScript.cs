@@ -13,16 +13,9 @@ public class JScript : MonoBehaviour
 
     [SerializeField] private AudioClip[] clips;
     [SerializeField] GameObject audiosourcePrefab;
-
-    private AudioSource audiosource;
-
+    
     private Vector3 moveTarget, moveOrigin;
     private float moveLerp, moveTime, moveTimePass;
-
-    private void Awake()
-    {
-        audiosource = GetComponent<AudioSource>();
-    }
 
     private void Update()
     {
@@ -89,27 +82,39 @@ public class JScript : MonoBehaviour
 
     public float PlayClip(int index)
     {
-        audiosource.clip = clips[index];
-        audiosource.Play();
+        //audiosource.clip = clips[index];
+        //audiosource.Play();
 
-        return audiosource.clip.length;
+        PlaySound(clips[index], 1f);
+
+        return clips[index].length;
     }
 
     public float PlayClip(int index, float inTime)
     {
-        audiosource.volume = 0.0f;
-        audiosource.DOFade(1.0f, inTime);
+        var component = PlaySound(clips[index], 0f);
+        component.DOFade(1.0f, inTime);
 
-        audiosource.clip = clips[index];
-        audiosource.Play();
-
-        return audiosource.clip.length;
+        return clips[index].length;
     }
 
-    public float EventOne()
+    public float PlayClip(int index, float volume, float pitch)
+    {
+        var component = PlaySound(clips[index], 0f);
+        component.volume = volume;
+        component.pitch = pitch;
+
+        return clips[index].length;
+    }
+
+    /// <summary>
+    /// open chest
+    /// </summary>
+    /// <returns></returns>
+    public float OpenChestSound()
     {
         //Open chest
-        return PlaySound(clips[4], 1.0f, new Vector3(1f, 0.5f, 0f));
+        return PlaySound(clips[3], 1.0f, new Vector3(1f, 0.5f, 0f));
     }
 
     private float PlaySound(AudioClip clip, float volume, Vector3 target)
@@ -122,5 +127,17 @@ public class JScript : MonoBehaviour
 
         Destroy(source, clip.length);
         return clip.length;
+    }
+
+    private AudioSource PlaySound(AudioClip clip, float volume)
+    {
+        var source = Instantiate(audiosourcePrefab, transform);
+        var component = source.GetComponent<AudioSource>();
+        component.clip = clip;
+        component.volume = volume;
+        component.Play();
+
+        Destroy(source, clip.length);
+        return component;
     }
 }
