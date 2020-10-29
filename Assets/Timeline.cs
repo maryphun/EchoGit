@@ -42,7 +42,7 @@ public class Timeline : MonoBehaviour
 
         if (clock > 1.0f && part == 0)
         {
-            StartCoroutine(PartThree());
+            StartCoroutine(PartOne());
             part++;
         }
 
@@ -172,7 +172,7 @@ public class Timeline : MonoBehaviour
 
         yield return new WaitForSeconds(waitTime + 1.0f);
 
-        J.OpenDoor();
+        J.OpenDoor(true);
 
         yield return new WaitForSeconds(2.0f);
 
@@ -214,21 +214,30 @@ public class Timeline : MonoBehaviour
 
         waitTime = J.PlayClip(2, 2f);
         
-        yield return new WaitForSeconds(waitTime + 2f);
+        yield return new WaitForSeconds(waitTime - 2.5f);
         
         waitTime = P.PlayClip(11, 2f);
 
-        yield return new WaitForSeconds(waitTime + 1.5f);
+        yield return new WaitForSeconds(waitTime + 0.5f);
 
-        J.Walk(new Vector3(-0.44f, 1f, 1.84f), 3f);
-
-        yield return new WaitForSeconds(1.5f);
-
-        waitTime = J.PlayClip(3);
+        waitTime = J.PlayClip(4);
         
         yield return new WaitForSeconds(waitTime - 1.5f);
 
-        J.Walk(new Vector3(-0.44f, 1f, 1.84f), 3f);
+        waitTime = 3f;
+        J.Walk(new Vector3(-0.44f, 1f, 1.84f), waitTime);
+
+        yield return new WaitForSeconds(waitTime - 0.5f);
+
+        waitTime = J.EventOne();
+
+        yield return new WaitForSeconds(waitTime - 1.0f);
+
+        waitTime = P.PlayClip(12, 2f);
+
+        yield return new WaitForSeconds(waitTime * 0.75f);
+
+        waitTime = P.PlaySoundEffect(36, 1.0f);
 
         PartDone(3);
     }

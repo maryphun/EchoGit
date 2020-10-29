@@ -12,6 +12,7 @@ public class JScript : MonoBehaviour
     private Vector3 lastPosition;
 
     [SerializeField] private AudioClip[] clips;
+    [SerializeField] GameObject audiosourcePrefab;
 
     private AudioSource audiosource;
 
@@ -68,14 +69,20 @@ public class JScript : MonoBehaviour
         isMoving = true;
     }
 
-    public void OpenDoor()
+    public void OpenDoor(bool closeLater)
     {
         foreach (GameObject door in GameObject.FindGameObjectsWithTag("Door"))
         {
-            Debug.Log(Vector2.Distance(new Vector2(door.transform.position.x, door.transform.position.z), new Vector2(transform.position.x, transform.position.z)) < 1.5f);
             if (Vector2.Distance(new Vector2(door.transform.position.x, door.transform.position.z), new Vector2(transform.position.x, transform.position.z)) < 1.5f)
             {
-                door.GetComponent<Door>().Open();
+                if (!closeLater)
+                {
+                    door.GetComponent<Door>().Open();
+                }
+                else
+                {
+                    door.GetComponent<Door>().OpenAndClose(2f);
+                }
             }
         }
     }
@@ -97,5 +104,23 @@ public class JScript : MonoBehaviour
         audiosource.Play();
 
         return audiosource.clip.length;
+    }
+
+    public float EventOne()
+    {
+        //Open chest
+        return PlaySound(clips[4], 1.0f, new Vector3(1f, 0.5f, 0f));
+    }
+
+    private float PlaySound(AudioClip clip, float volume, Vector3 target)
+    {
+        var source = Instantiate(audiosourcePrefab, target, Quaternion.identity);
+        var component = source.GetComponent<AudioSource>();
+        component.clip = clip;
+        component.volume = volume;
+        component.Play();
+
+        Destroy(source, clip.length);
+        return clip.length;
     }
 }

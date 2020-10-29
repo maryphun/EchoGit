@@ -7,6 +7,7 @@ public class PScript : MonoBehaviour
 {
     [SerializeField] private AudioClip[] clips;
     [SerializeField] private Timeline timeline;
+    [SerializeField] GameObject audiosourcePrefab;
 
     private AudioSource audiosource;
 
@@ -39,10 +40,27 @@ public class PScript : MonoBehaviour
         audiosource.DOFade(targetValue, time);
     }
 
-
     public void FadeAudioSource(float originValue, float targetValue, float time)
     {
         audiosource.volume = originValue;
         audiosource.DOFade(targetValue, time);
+    }
+
+    public float PlaySoundEffect(int clip, float volume)
+    {
+        //Open chest
+        return PlaySound(clips[clip], volume, transform.position);
+    }
+
+    private float PlaySound(AudioClip clip, float volume, Vector3 target)
+    {
+        var source = Instantiate(audiosourcePrefab, target, Quaternion.identity);
+        var component = source.GetComponent<AudioSource>();
+        component.clip = clip;
+        component.volume = volume;
+        component.Play();
+
+        Destroy(source, clip.length);
+        return clip.length;
     }
 }

@@ -27,6 +27,30 @@ public class Door : MonoBehaviour
         }
     }
 
+    public void OpenAndClose(float delay)
+    {
+        if (!locked)
+        {
+            transform.DOMoveY(transform.position.y + GetComponent<Collider>().bounds.extents.y, 1.0f, false);
+
+            PlaySound(openDoor, 1.0f);
+
+            StartCoroutine(CloseAfterDelay(delay));
+        }
+        else
+        {
+            PlaySound(openLockedDoor, 0.4f);
+        }
+    }
+
+    private IEnumerator CloseAfterDelay(float time)
+    {
+        yield return new WaitForSeconds(time);
+        transform.DOMoveY(transform.position.y - GetComponent<Collider>().bounds.extents.y, 1.0f, false);
+        Debug.Log("close door");
+        PlaySound(closeDoor, 1.0f);
+    }
+
     private void PlaySound(AudioClip clip, float volume)
     {
         var source = Instantiate(audiosourceprefab, transform);
