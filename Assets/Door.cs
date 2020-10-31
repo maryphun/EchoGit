@@ -13,13 +13,22 @@ public class Door : MonoBehaviour
     [SerializeField] private bool locked = false;
 
     // Start
-    public void Open()
+    public void Open(bool ignoreLock)
     {
-        if (!locked)
+        if (!locked || ignoreLock)
         {
             transform.DOMoveY(transform.position.y + GetComponent<Collider>().bounds.extents.y, 1.0f, false);
 
             PlaySound(openDoor, 1.0f);
+
+            if (GetComponent<PartSix>() != null)
+            {
+                GetComponent<PartSix>().Opened();
+            }
+            if (GetComponent<PartNine>() != null)
+            {
+                GetComponent<PartNine>().Opened();
+            }
         }
         else
         {
@@ -32,9 +41,17 @@ public class Door : MonoBehaviour
         }
     }
 
-    public void OpenAndClose(float delay)
+    public void Close(bool lockDoor)
     {
-        if (!locked)
+        transform.DOMoveY(transform.position.y - GetComponent<Collider>().bounds.extents.y, 1.0f, false);
+        Debug.Log("close door");
+        PlaySound(closeDoor, 1.0f);
+        if (lockDoor) locked = true;
+    }
+
+    public void OpenAndClose(float delay, bool ignoreLock)
+    {
+        if (!locked || ignoreLock)
         {
             transform.DOMoveY(transform.position.y + GetComponent<Collider>().bounds.extents.y, 1.0f, false);
 

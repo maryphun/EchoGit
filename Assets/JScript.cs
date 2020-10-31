@@ -70,11 +70,11 @@ public class JScript : MonoBehaviour
             {
                 if (!closeLater)
                 {
-                    door.GetComponent<Door>().Open();
+                    door.GetComponent<Door>().Open(true);
                 }
                 else
                 {
-                    door.GetComponent<Door>().OpenAndClose(2f);
+                    door.GetComponent<Door>().OpenAndClose(2f, true);
                 }
             }
         }

@@ -29,7 +29,7 @@ public class DoorScript : MonoBehaviour
                     // open this door
                     if (Vector3.Distance(hit.point, Camera.main.transform.position) < minOpenDistance)
                     {
-                        door.Open();
+                        door.Open(false);
                     }
                 }
             }
